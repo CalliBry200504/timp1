@@ -9,8 +9,8 @@ node('agent1') {
         app = docker.build("traktori/timp1") // Строим и присваиваем переменной app
     }
 
-    stage('Post-to-dockerhub') {
-        docker.withRegistry('traktori', 'timp1') {
+   stage('Post-to-dockerhub') {
+        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub_creds') {
             app.push("latest") // Пушим с тэгом "latest"
         }
     }
