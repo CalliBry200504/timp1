@@ -1,40 +1,22 @@
-pipeline {
-    agent any
-    stages {
-        stage('Cloning Git') {
-            steps {
-                checkout scm
-            }
+node('agent1') {
+    def app // Объявляем переменную
+
+    stage('Cloning Git') {
+        checkout scm
+    }
+
+    stage('Build-and-Tag') {
+        app = docker.build("traktori/timp1") // Строим и присваиваем переменной app
+    }
+
+    stage('Post-to-dockerhub') {
+        docker.withRegistry('traktori', 'timp1') {
+            app.push("latest") // Пушим с тэгом "latest"
         }
-        stage('SAST') {
-            steps {
-                sh 'echo SAST stage'
-            }
-        }
-        stage('Build-and-Tag') {
-            steps {
-                sh 'echo Build-and-Tag'
-            }
-        }
-        stage('Post-to-dockerhub') {
-            steps {
-                sh 'echo post to dockerhub repo'
-            }
-        }
-        stage('SECURITY-IMAGE-SCANNER') {
-            steps {
-                sh 'echo scan image for security'
-            }
-        }
-        stage('Pull-image-server') {
-            steps {
-                sh 'echo pulling image ....'
-            }
-        }
-        stage('DAST') {
-            steps {
-                sh 'echo dast scan for security'
-            }
-        }
+    }
+
+    stage('Pull-image-server') {
+        sh "docker-compose down" // Останавливаем контейнеры
+        sh "docker-compose up -d" // Запускаем контейнеры в фоновом режиме
     }
 }
