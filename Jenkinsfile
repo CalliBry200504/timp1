@@ -1,4 +1,4 @@
-node('agent1') {
+node('agent007') {
     def app // Объявляем переменную
 
     stage('Cloning Git') {
